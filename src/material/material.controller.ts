@@ -21,28 +21,13 @@ export class MaterialController {
   }
 
   @Get(':id')
-  FindMaterialById(@Param() id: number) {
+  FindMaterialById(@Param('id') id: number) {
     return this.materialService.findById(id);
   }
 
-  @Get('count/all')
-  getTotalMaterials() {
-    return this.materialService.getTotalMaterials();
-  }
-
-  @Get('count/bad')
-  getTotalBadMaterials() {
-    return this.materialService.getTotalBadMaterials();
-  }
-
-  @Get('count/good')
-  getTotalGoodMaterials() {
-    return this.materialService.getTotalGoodMaterials();
-  }
-
-  @Get('count/damaging')
-  getTotalDamagingFMaterials() {
-    return this.materialService.getTotalDamagingMaterials();
+  @Get('count/stats')
+  getTotalMaterialStats() {
+    return this.materialService.getTotalMaterialQuantities();
   }
 
   @Post('')
@@ -52,14 +37,14 @@ export class MaterialController {
 
   @Patch(':id')
   UpdateMaterialById(
-    @Param() id: number,
+    @Param('id') id: number,
     @Body() materialDatas: UpdateMaterialDto,
   ) {
     return this.materialService.UpdateMaterialById(id, materialDatas);
   }
 
   @Delete(':id')
-  DeleteMaterialById(@Param() id: number) {
+  DeleteMaterialById(@Param('id') id: number) {
     return this.materialService.deleteById(id);
   }
 }

@@ -65,7 +65,6 @@ export class MaterialService {
     id: number,
     materialDatas: UpdateMaterialDto,
   ): Promise<void> {
-    console.log(materialDatas);
     try {
       await this.materialRepository.update(id, materialDatas);
     } catch (err) {
@@ -74,54 +73,35 @@ export class MaterialService {
   }
 
   /**
-   * Count all materials
-   * @returns {Promise<Number>}
+   * Get total material stats
+   * @returns {Promise<{total: number; good: number; damaging: number; bad: number;}>}
    */
-  async getTotalMaterials(): Promise<number> {
+  async getTotalMaterialQuantities(): Promise<{
+    total: number;
+    good: number;
+    damaging: number;
+    bad: number;
+  }> {
     try {
-      return await this.materialRepository.count();
-    } catch (err) {
-      throw new HttpException('Internal server error', 500);
-    }
-  }
+      const materials = await this.materialRepository.find();
 
-  /**
-   * Count all bad materials
-   * @returns {Promise<Number>}
-   */
-  async getTotalBadMaterials(): Promise<number> {
-    try {
-      return await this.materialRepository.count({
-        where: { state: MaterialState.BAD },
-      });
-    } catch (err) {
-      throw new HttpException('Internal server error', 500);
-    }
-  }
+      let total = 0;
+      let good = 0;
+      let damaging = 0;
+      let bad = 0;
 
-  /**
-   * Count all good materials
-   * @returns {Promise<Number>}
-   */
-  async getTotalGoodMaterials(): Promise<number> {
-    try {
-      return await this.materialRepository.count({
-        where: { state: MaterialState.GOOD },
+      materials.forEach((material) => {
+        total += material.quantity;
+        if (material.state === MaterialState.GOOD) {
+          good += material.quantity;
+        } else if (material.state === MaterialState.DAMAGING) {
+          damaging += material.quantity;
+        } else if (material.state === MaterialState.BAD) {
+          bad += material.quantity;
+        }
       });
-    } catch (err) {
-      throw new HttpException('Internal server error', 500);
-    }
-  }
 
-  /**
-   * Count all good materials
-   * @returns {Promise<Number>}
-   */
-  async getTotalDamagingMaterials(): Promise<number> {
-    try {
-      return await this.materialRepository.count({
-        where: { state: MaterialState.DAMAGING },
-      });
+      return { total, good, damaging, bad };
     } catch (err) {
       throw new HttpException('Internal server error', 500);
     }
